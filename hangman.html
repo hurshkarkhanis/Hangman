@@ -1,0 +1,348 @@
+<html>
+<head>
+	<title>The Game</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+	<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.5/yeti/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+	<img src = "stage0.png" id = "kobe">
+
+
+	<h1 id = "title">Hangman</h1>
+	
+
+	<div id = 'dashes'></div>
+	<div id = 'clue'>CLUE GOES HERE</div>
+	<div id = 'gravevard'></div>
+
+	<a href="hangman.html" class="btn btn-default" role="button" id= "resetButton">Reset</a>
+
+
+
+
+	<style>
+
+		body{
+			background: black;
+		}
+
+		#title{
+			color:white;
+			position: absolute;
+		    left: 34%;
+		    font-size: 100px;
+
+
+
+			
+		}
+
+		#dashes{
+			color:white;
+			font-size: 200px;
+			margin-left : 5%;
+			top: 60%;
+			position: absolute;
+
+		}
+
+		#kobe{
+			width: 25%;
+			height: 70%;
+			position: absolute;
+			background: purple;
+
+			left: 60%;
+			top: 25%;
+		}
+
+		#clue{
+			color:white;
+			position: absolute;
+		    left: 5%;
+		    top: 40%;
+		    font-size: 50px;
+
+		}
+
+		#gravevard{
+			color:white;
+			position: absolute;
+		    left: 64%;
+		    top: 87.5%;
+		    font-size: 50px;
+		}
+
+		#resetButton{
+			position: absolute;
+			left: 80%;
+			top: 90%;
+			background-color: white;
+			border-color : white;
+			color: black;
+		}
+
+		
+
+
+
+
+	</style>
+
+	<script>
+
+	var ticking = new Audio ("ticking.mp3");
+	
+
+	ticking.play();
+
+
+
+
+	var words = ['retro','light', 'model', 'runway', 'camera','basketball',
+				'poise', 'smile', 'eyes', 'future', 'school', 'college', 'work', 'salary',
+				'happy', 'hope', 'drive', 'focus', 'desire', 'mamba', 'winner', 'trophy', 
+				'shine', 'critics', 'media', 'park', 'court', 'love', 'night', 'sleep'];
+
+
+	var clues = ['Old-School', '_____ up the sky', 'Pursed lips and makeup', 'Tarmac', "'PC _______ man'",
+					'Pick- up __________', "Character", "'_____ and wave, boys'" ,'Rhymes with hypnotize', 'Time Travel?', 'Denentions and Graduations', 'Four years', 'Cubicles', 
+					'Tax Bracket',
+				'Pharell','Obama poster', 'Relentlessness', 'Distractions', 'Longing', 'Black _____', 'Holder of the trophy', 'Reward', 'Sun_____', '_______ will always scrutinize', 'Cameras and Magazines', 'Great American Ball____', '_____ martial', '"You just know"','Elie Wiesel novel', 'REM'];
+
+
+
+	function getWordandClue(){
+		var chosenIndex = Math.floor(Math.random() *  words.length);
+
+		$("#clue").text(clues[chosenIndex]);
+
+		return words[chosenIndex];
+
+	}
+
+	var useThisWord = getWordandClue();
+
+	console.log(useThisWord);
+
+	function createBlanks(){
+		var out = "";
+		var brokenWord = useThisWord.split("");
+		for(var i = 0 ; i < brokenWord.length ; i++){
+			out+="-"; //underscore
+		}
+
+		
+		return out;
+
+		
+
+	}
+
+	createBlanks();
+	//starting display - all blanks
+	var display = createBlanks();
+	$("#dashes").text(createBlanks());
+
+	//guessing 
+	//if letter = letter in broken word
+	//then change the dash in splitDisplay to the correct letter
+
+	var graveContent = "";
+
+	var numWrongs = 0;
+
+	function guess(letter){
+		var brokenWord = useThisWord.split("");
+
+		var fix = true;
+
+		var gameOver = false;
+
+		var splitDisplay = display.split("");
+
+		for(var i = 0 ; i < brokenWord.length ; i++){
+			if(letter == brokenWord[i]){
+				splitDisplay[i] = letter;
+				fix = false;
+			}
+			
+		}
+
+		if(fix){
+			graveContent += letter + " ";
+			$("#gravevard").text(graveContent);
+			numWrongs ++;
+
+			
+
+
+			switch(numWrongs){
+				case 1:
+					document.getElementById("kobe").src = "stage1.png";
+					break;
+				case 2:
+					document.getElementById("kobe").src = "stage2.png";
+					break;
+				case 3:
+					document.getElementById("kobe").src = "stage3.png";
+					break;
+				case 4:
+					document.getElementById("kobe").src = "stage4.png";
+					break;
+				case 5:
+					document.getElementById("kobe").src = "stage5.png";
+					break;
+				case 6:
+					document.getElementById("kobe").src = "stage6.png";
+					$("#gravevard").text("Hanged!");
+					gameOver = true;
+					break;
+				case 7:
+					location.replace("hangman.html");
+					break;
+
+
+			}
+		}
+
+		display = "";
+		
+		if(gameOver){
+			display = useThisWord;
+		} else{
+			for(var j = 0 ; j < splitDisplay.length ; j++){
+				display += splitDisplay[j];
+			}
+		}
+
+		$("#dashes").text(display);
+
+
+
+
+		
+
+
+	}
+
+
+	function see(){
+
+		var letter = $("#field").val();
+		guess(letter);
+		$("#field").val("");
+
+	}
+
+	$(window).keypress(catchGuess);
+
+	
+
+	
+
+
+
+
+	function catchGuess(event){
+		switch(event.keyCode){
+			case 97://a
+				guess("a"); 
+		        break;
+		    case 98://b
+		    	guess("b"); 
+		    	break;
+		    case 99://c
+		        guess("c"); 
+		        break;
+		    case 100://d
+		    	guess("d"); 
+		    	break;
+	    	case 101://e  
+	    		guess("e"); 
+		        break;
+		    case 102://f
+		    	guess("f"); 
+		    	break;
+		    case 103://g
+		    	guess("g"); 
+		        break;
+		    case 104://h
+		    	guess("h"); 
+		    	break;
+	    	case 105://i
+	    		guess("i"); 
+		        break;
+		    case 106://j
+		    	guess("j"); 
+		    	break;
+		    case 107://k
+		    	guess("k"); 
+		        break;
+		    case 108://l
+		    	guess("l"); 
+		    	break;
+	    	case 109://m
+	    		guess("m"); 
+		        break;
+		    case 110://n
+		    	guess("n"); 
+		    	break;
+		    case 111://o
+		    	guess("o"); 
+		        break;
+		    case 112://p
+		    	guess("p"); 
+		    	break;
+	    	case 113://q
+	    		guess("q"); 
+		        break;
+		    case 114://r
+		    	guess("r"); 
+		    	break;
+		    case 115: //s
+		    	guess("s"); 
+		        break;
+		    case 116://t
+		    	guess("t"); 
+		    	break;
+	    	case 117://u
+	    		guess("u"); 
+		        break;
+		    case 118://v
+		    	guess("v"); 
+		    	break;
+		    case 119://w  
+		    	guess("w"); 
+		        break;
+		    case 120://x
+		    	guess("x"); 
+		    	break;
+	    	case 121://y
+	    		guess("y"); 
+		        break;
+		    case 122://z
+		    	guess("z"); 
+		    	break;
+
+		}
+
+	}
+
+	
+
+	
+	
+
+
+
+
+
+
+	</script>
+
+</body>
+</html>
